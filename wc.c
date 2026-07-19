@@ -56,4 +56,30 @@ void print_counts(const char *label, const struct word_count *counters) {
          counters->bytes, label);
 }
 
-int main(int argc, char *argv[]) { return 0; }
+int main(int argc, char *argv[]) {
+  struct word_count total = {0, 0, 0};
+
+  if (argc == 1) {
+    if (wc_stream(stdin, &total) == 0) {
+      print_counts("-", &total);
+    }
+  } else {
+    for (int i = 1; i < argc; i++) {
+      struct word_count file_counter = {0, 0, 0};
+      if (wc_file(argv[i], &file_counter) == -1) {
+        continue;
+      }
+
+      print_counts(argv[i], &file_counter);
+
+      total.bytes += file_counter.bytes;
+      total.words += file_counter.words;
+      total.lines += file_counter.lines;
+    }
+  }
+
+  if (argc > 2) {
+    print_counts("total", &total);
+  }
+  return 0;
+}
